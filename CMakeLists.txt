@@ -7,13 +7,19 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(OpenCV REQUIRED COMPONENTS core imgcodecs imgproc videoio highgui)
+find_package(Threads REQUIRED)
 
 add_library(edge_iqa_core
+    src/alert.cpp
     src/metrics.cpp
     src/image_io.cpp
     src/batch_runner.cpp
     src/csv_writer.cpp
     src/distortions.cpp
+    src/frame_metrics.cpp
+    src/stream_csv_writer.cpp
+    src/tcp_transport.cpp
+    src/video_source.cpp
 )
 
 target_include_directories(edge_iqa_core
@@ -59,6 +65,55 @@ target_link_libraries(iqa_generate
 )
 
 target_compile_options(iqa_generate
+    PRIVATE
+        -Wall
+        -Wextra
+        -Wpedantic
+)
+
+add_executable(iqa_stream
+    apps/iqa_stream/main.cpp
+)
+
+target_link_libraries(iqa_stream
+    PRIVATE
+        edge_iqa_core
+        Threads::Threads
+)
+
+target_compile_options(iqa_stream
+    PRIVATE
+        -Wall
+        -Wextra
+        -Wpedantic
+)
+
+add_executable(iqa_tcp_server
+    apps/iqa_tcp_server/main.cpp
+)
+
+target_link_libraries(iqa_tcp_server
+    PRIVATE
+        edge_iqa_core
+)
+
+target_compile_options(iqa_tcp_server
+    PRIVATE
+        -Wall
+        -Wextra
+        -Wpedantic
+)
+
+add_executable(iqa_tcp_client
+    apps/iqa_tcp_client/main.cpp
+)
+
+target_link_libraries(iqa_tcp_client
+    PRIVATE
+        edge_iqa_core
+)
+
+target_compile_options(iqa_tcp_client
     PRIVATE
         -Wall
         -Wextra
